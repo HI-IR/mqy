@@ -1,8 +1,7 @@
 package com.mqy.mqy.auth.service
 
-import org.springframework.stereotype.Service
+import com.mqy.mqy.auth.pojo.AvatarUploadVO
 
-@Service
 interface AuthService {
-
+	fun getAvatarUploadUrl(): AvatarUploadVO
 }

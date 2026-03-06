@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 9090
   address: 0.0.0.0
 
 spring:
@@ -12,6 +12,9 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 100MB
+  # 开启json蛇形映射
+  jackson:
+    property-naming-strategy: SNAKE_CASE
 
 mybatis:
   configuration:
@@ -31,3 +34,9 @@ auth:
     token-name: token
     ttl: 3600000
     # secret-key请配置在application-local.yaml中
+
+aliyun:
+  oss:
+    bucket-name: hhr-mqy
+    endpoint: https://oss-cn-beijing.aliyuncs.com
+    region: cn-beijing
