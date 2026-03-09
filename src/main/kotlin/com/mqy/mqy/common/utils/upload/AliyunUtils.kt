@@ -1,6 +1,7 @@
 package com.mqy.mqy.common.utils.upload
 
 import com.aliyun.oss.HttpMethod
+import com.aliyun.oss.OSS
 import com.aliyun.oss.OSSClientBuilder
 import com.aliyun.oss.model.GeneratePresignedUrlRequest
 import com.aliyun.sts20150401.Client
@@ -46,7 +47,7 @@ class StsProvider(private val properties: AliyunProperties) {
 }
 
 @Component
-class OssSignUtil(private val properties: AliyunProperties) {
+class OssUtil(private val properties: AliyunProperties, private val ossClient: OSS) {
 	/**
 	 * 生成 PUT 方式的预签名 URL
 	 *
@@ -78,4 +79,35 @@ class OssSignUtil(private val properties: AliyunProperties) {
 			ossClient.shutdown()
 		}
 	}
+
+	/**
+	 * 生成 PUT 方式的预签名 URL
+	 * Params:
+	 * sourceKey - 源路径
+	 * targetKey - 目标路径
+	 */
+	fun moveObject(
+		sourceKey: String,
+		targetKey: String,
+	) {
+		println("${sourceKey}->${targetKey}")
+		ossClient.copyObject(properties.bucketName, sourceKey, properties.bucketName, targetKey)
+		ossClient.deleteObject(properties.bucketName, sourceKey)
+	}
+
+	/**
+	 * 通过传入的objectName获取完整的URL
+	 */
+	fun getTheCompleteURL(objectName: String): String =
+		properties.endpoint.split("//".toRegex()).dropLastWhile { it.isEmpty() }
+			.toTypedArray()[0] + "//" + properties.bucketName + "." + properties.endpoint.split("//".toRegex())
+			.dropLastWhile { it.isEmpty() }
+			.toTypedArray()[1] + "/" + objectName
+
+	/**
+	 * 传入临时路径 转化为存储路径
+	 * tmp/avatars/20260309-1350867f104f456a985860026ef8395b.jpg
+	 * avatars/20260309-1350867f104f456a985860026ef8395b.jpg
+	 */
+	fun getTargetUrl(objectUrl: String): String = objectUrl.removePrefix("tmp/")
 }

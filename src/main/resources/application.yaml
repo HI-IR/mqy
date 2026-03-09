@@ -1,11 +1,11 @@
 server:
   port: 9090
   address: 0.0.0.0
-
 spring:
+  profiles:
+    active: local
   application:
     name: mqy
-
   # 数据库配置在application-local.yaml中配置
 
   servlet:
@@ -16,18 +16,12 @@ spring:
   jackson:
     property-naming-strategy: SNAKE_CASE
 
-mybatis:
+mybatis-plus:
   configuration:
-    # 数据库日志
+    # 在控制台打印生成的 SQL 语句
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    # 开启驼峰命名映射
+    # 开启驼峰命名自动映射 (数据库 user_name -> 实体类 userName)
     map-underscore-to-camel-case: true
-
-pagehelper:
-  helperDialect: mysql
-  reasonable: true
-  supportMethodsArguments: true
-  params: count=countSql
 
 auth:
   token:
