@@ -8,10 +8,10 @@ import com.baomidou.mybatisplus.annotation.TableName
  * 用户缩略信息表
  */
 @TableName("user_statistics")
-data class UserStatisticEntity(
+class UserStatisticEntity {
 	@TableId(type = IdType.INPUT)
-	val userId: Int? = null,
-	val totalLikesReceived: Long? = null,
-	val totalPostCount: Long? = null,
-	val totalFollowingCount: Long? = null
-)
+	var userId: Long? = null
+	var totalLikesReceived: Long? = null
+	var totalPostCount: Long? = null
+	var totalFollowingCount: Long? = null
+}

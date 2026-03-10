@@ -9,24 +9,24 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @TableName("cat")
-data class CatEntity(
+class CatEntity {
 	@TableId(type = IdType.AUTO)
-	val id: Long? = null,
-	val name: String = "",
-	val avatar: String? = null,
-	val gender: Int = 0,
-	val neuteredStatus: Int = 0,
-	val birthDate: LocalDate = LocalDate.now(),
-	val arrivalDate: LocalDate = LocalDate.now(),
-	val status: Int = 0,
-	val coatColor: Int = 0,
-	val position: String = "",
-	val story: String? = null,
-	val creatorId: Long = 0L,
+	var id: Long? = null
+	var name: String? = null
+	var avatar: String? = null
+	var gender: Int? = null
+	var neuteredStatus: Int? = null
+	var birthDate: LocalDate? = null
+	var arrivalDate: LocalDate? = null
+	var status: Int? = null
+	var coatColor: Int? = null
+	var position: String? = null
+	var story: String? = null
+	var creatorId: Long? = null
 
 	@TableField(fill = FieldFill.INSERT)
-	val createTime: LocalDateTime = LocalDateTime.now(),
+	var createTime: LocalDateTime? = null
 
 	@TableField(fill = FieldFill.INSERT_UPDATE)
-	val updateTime: LocalDateTime = LocalDateTime.now()
-)
+	var updateTime: LocalDateTime? = null
+}

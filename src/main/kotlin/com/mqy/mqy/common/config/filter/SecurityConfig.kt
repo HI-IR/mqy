@@ -1,6 +1,5 @@
 package com.mqy.mqy.common.config.filter
 
-import com.mqy.mqy.auth.service.AuthService
 import com.mqy.mqy.auth.service.impl.UserServiceImpl
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.context.annotation.Bean
@@ -35,6 +34,7 @@ class SecurityConfig(
 		HttpMethod.GET to "/cats/avatar-upload-url",
 		HttpMethod.POST to "/cats"
 	)
+
 	@Bean
 	fun authenticationManager(config: AuthenticationConfiguration): AuthenticationManager {
 		return config.authenticationManager
@@ -75,7 +75,7 @@ class SecurityConfig(
 					auth.requestMatchers(method, url).permitAll()
 				}
 				adminUrl.forEach { (method, url) ->
-					auth.requestMatchers(method, url).hasRole("ADMIN")
+					auth.requestMatchers(method, url).hasAuthority("ADMIN")
 				}
 				auth.anyRequest().authenticated()
 			}

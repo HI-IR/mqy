@@ -1,6 +1,5 @@
 package com.mqy.mqy.common.config.filter
 
-import com.mqy.mqy.common.utils.jwt.AuthException
 import com.mqy.mqy.common.utils.jwt.JwtUtils
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -31,8 +30,10 @@ class JwtFilter(private val jwtUtils: JwtUtils, private val handlerExceptionReso
 				val map = jwtUtils.parseToken(token)
 				val username = map["username"] ?: ""
 				val role = map["role"] as String
+				val id = map["id"] ?: ""
+				val userDetails = CustomUserDetail(id as String, username as String)
 				val authorities = listOf(SimpleGrantedAuthority(role))
-				val authentication = UsernamePasswordAuthenticationToken(username, null, authorities).apply {
+				val authentication = UsernamePasswordAuthenticationToken(userDetails, null, authorities).apply {
 					details = WebAuthenticationDetailsSource().buildDetails(request)
 				}
 				SecurityContextHolder.getContext().authentication = authentication

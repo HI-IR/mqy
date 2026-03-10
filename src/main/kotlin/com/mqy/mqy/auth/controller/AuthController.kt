@@ -41,4 +41,8 @@ class AuthController(private val service: AuthService) {
 		return ApiResponse.success(vo)
 	}
 
+	@PostMapping("/logout")
+	fun logout(): ApiResponse {
+		return ApiResponse.success()
+	}
 }
