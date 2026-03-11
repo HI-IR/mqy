@@ -35,7 +35,7 @@ class CatsServiceImpl(
 	override fun getAvatarUploadUrl(): CatsAvatarUploadVO {
 		val dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
 		val uuid = UUID.randomUUID().toString().replace("-", "")
-		val objectKey = "tmp/cats/avatar/$dateStr-$uuid.jpg"
+		val objectKey = "cats/avatar/$dateStr-$uuid.jpg"
 		//获取凭证
 		val credentials = stsProvider.getCredentials(sessionName = "CatsAvatarUpload")
 		val presignedUrl = ossUtil.generatePresignedPutUrl(
@@ -58,11 +58,7 @@ class CatsServiceImpl(
 		val user = authentication.principal as CustomUserDetail
 		catMapper.selectUserByUserId(user.id.toLong()) ?: throw RuntimeException("未找到该用户信息")
 		try {
-			val targetKey = normalizeAvatarKey(addCatsDTO.avatarKey)
-			ossUtil.moveObject(
-				sourceKey = addCatsDTO.avatarKey,
-				targetKey = targetKey,
-			)
+			val targetKey = addCatsDTO.avatarKey
 			val catEntity = CatEntity().apply {
 				name = addCatsDTO.name
 				avatar = ossUtil.getTheCompleteURL(targetKey)
@@ -146,9 +142,7 @@ class CatsServiceImpl(
 
 	}
 
-	/**
-	 * 收养猫咪
-	 */
+
 	override fun adoptCat(adoptCatDTO: AdoptCatDTO) {
 		val userId = (SecurityContextHolder.getContext().authentication.principal as CustomUserDetail).id.toLong()
 		val catId = adoptCatDTO.catID
@@ -163,10 +157,5 @@ class CatsServiceImpl(
 			this.isAccept = 0
 		}
 		catAdoptMapper.insert(adoptEntity)
-	}
-
-	private fun normalizeAvatarKey(tempKey: String): String {
-		require(tempKey.startsWith("tmp/cats/avatar/")) { "非法头像路径" }
-		return tempKey.removePrefix("tmp/")
 	}
 }

@@ -20,7 +20,7 @@ data class AddCatsDTO(
 	val arrivalDate: LocalDate,
 
 	/**
-	 * tmp/avatars/20260304-uuid.jpg
+	 * avatars/20260304-uuid.jpg
 	 */
 	@get:JsonProperty("avatar_key", required = true) @field:JsonProperty("avatar_key", required = true)
 	val avatarKey: String,

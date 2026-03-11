@@ -1,7 +1,6 @@
 package com.mqy.mqy.common.utils.upload
 
 import com.aliyun.oss.HttpMethod
-import com.aliyun.oss.OSS
 import com.aliyun.oss.OSSClientBuilder
 import com.aliyun.oss.model.GeneratePresignedUrlRequest
 import com.aliyun.sts20150401.Client
@@ -47,7 +46,7 @@ class StsProvider(private val properties: AliyunProperties) {
 }
 
 @Component
-class OssUtil(private val properties: AliyunProperties, private val ossClient: OSS) {
+class OssUtil(private val properties: AliyunProperties) {
 	/**
 	 * 生成 PUT 方式的预签名 URL
 	 *
@@ -81,21 +80,6 @@ class OssUtil(private val properties: AliyunProperties, private val ossClient: O
 	}
 
 	/**
-	 * 生成 PUT 方式的预签名 URL
-	 * Params:
-	 * sourceKey - 源路径
-	 * targetKey - 目标路径
-	 */
-	fun moveObject(
-		sourceKey: String,
-		targetKey: String,
-	) {
-		println("${sourceKey}->${targetKey}")
-		ossClient.copyObject(properties.bucketName, sourceKey, properties.bucketName, targetKey)
-		ossClient.deleteObject(properties.bucketName, sourceKey)
-	}
-
-	/**
 	 * 通过传入的objectName获取完整的URL
 	 */
 	fun getTheCompleteURL(objectName: String): String =
@@ -105,9 +89,12 @@ class OssUtil(private val properties: AliyunProperties, private val ossClient: O
 			.toTypedArray()[1] + "/" + objectName
 
 	/**
-	 * 传入临时路径 转化为存储路径
-	 * tmp/avatars/20260309-1350867f104f456a985860026ef8395b.jpg
-	 * avatars/20260309-1350867f104f456a985860026ef8395b.jpg
+	 * 获取视频的缩略图
+	 * @param originalVideoUrl 原始视频地址
+	 * @param timeMs 时间戳
 	 */
-	fun getTargetUrl(objectUrl: String): String = objectUrl.removePrefix("tmp/")
+	fun getVideoThumbnailUrl(originalVideoUrl: String, timeMs: Long = 0): String {
+		val processParams = "?x-oss-process=video/snapshot,t_$timeMs,f_jpg,m_fast"
+		return "$originalVideoUrl$processParams"
+	}
 }

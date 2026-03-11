@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 //   帖子的实体类
 @TableName("post")
-class Post {
+class PostEntity {
 	@TableId(type = IdType.AUTO)
 	var id: Long? = null
 	var userId: Long? = null

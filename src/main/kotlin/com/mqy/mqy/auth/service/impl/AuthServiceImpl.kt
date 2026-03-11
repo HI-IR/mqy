@@ -37,7 +37,7 @@ class AuthServiceImpl(
 	override fun getAvatarUploadUrl(): UserAvatarUploadVO {
 		val dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
 		val uuid = UUID.randomUUID().toString().replace("-", "")
-		val objectKey = "tmp/avatars/$dateStr-$uuid.jpg"
+		val objectKey = "avatars/$dateStr-$uuid.jpg"
 		//获取凭证
 		val credentials = stsProvider.getCredentials(sessionName = "UserAvatarUpload")
 		val presignedUrl = ossUtil.generatePresignedPutUrl(
@@ -78,14 +78,13 @@ class AuthServiceImpl(
 		}
 		val encodedPassword = passwordEncoder.encode(request.password)
 		val sourceKey = request.avatarKey
-		val targetKey = normalizeAvatarKey(sourceKey)
 		try {
 			val userEntity = UserEntity().apply {
 				id = null
 				username = request.username
 				passwordHash = encodedPassword
 				role = "USER"
-				avatarUrl = ossUtil.getTheCompleteURL(targetKey)
+				avatarUrl = ossUtil.getTheCompleteURL(sourceKey)
 			}
 			mapper.insert(userEntity)
 			val userId = userEntity.id ?: throw RuntimeException("主键生成失败")
@@ -98,7 +97,6 @@ class AuthServiceImpl(
 			if (userMapper.insert(statistics) < 0) {
 				throw RuntimeException("初始化统计表失败")
 			}
-			ossUtil.moveObject(sourceKey = sourceKey, targetKey = targetKey)
 			val token = jwtUtils.generateToken(userEntity.generateClaims())
 
 			return LoginVO(
@@ -109,10 +107,5 @@ class AuthServiceImpl(
 		} catch (e: Exception) {
 			throw RuntimeException("注册失败: ${e.message}", e)
 		}
-	}
-
-	private fun normalizeAvatarKey(tempKey: String): String {
-		require(tempKey.startsWith("tmp/avatars/")) { "非法头像路径" }
-		return tempKey.removePrefix("tmp/")
 	}
 }
