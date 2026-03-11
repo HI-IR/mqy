@@ -93,6 +93,7 @@ class AuthServiceImpl(
 				this.totalFollowingCount = 0
 				this.totalPostCount = 0
 				this.totalLikesReceived = 0
+				this.totalLikesCount = 0
 			}
 			if (userMapper.insert(statistics) < 0) {
 				throw RuntimeException("初始化统计表失败")

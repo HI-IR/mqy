@@ -28,6 +28,8 @@ class SecurityConfig(
 		HttpMethod.GET to "/auth/avatar-upload-url",
 		HttpMethod.POST to "/auth/login",
 		HttpMethod.POST to "/auth/register",
+		HttpMethod.GET to "/posts/*",
+		HttpMethod.POST to "/suggest"
 	)
 
 	private val adminUrl = listOf(

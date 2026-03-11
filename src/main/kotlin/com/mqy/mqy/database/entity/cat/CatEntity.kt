@@ -18,7 +18,7 @@ class CatEntity {
 	var neuteredStatus: Int? = null
 	var birthDate: LocalDate? = null
 	var arrivalDate: LocalDate? = null
-	var status: Int? = null
+	var state: Int? = null
 	var coatColor: Int? = null
 	var position: String? = null
 	var story: String? = null

@@ -20,5 +20,5 @@ class FollowEntity {
 	var updateTime: LocalDateTime? = null
 
 	@TableLogic(value = "0", delval = "1")
-	var status: Int = 0 // 0表示未删除，1表示已删除
+	var deleted: Int = 0 // 0表示未删除，1表示已删除
 }

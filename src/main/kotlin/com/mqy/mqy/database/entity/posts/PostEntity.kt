@@ -12,9 +12,11 @@ class PostEntity {
 	var catId: Long? = null
 	var title: String? = null
 	var content: String? = null
+	var likeCount: Long? = null
 
 	@TableField(fill = FieldFill.INSERT)
 	var createTime: LocalDateTime? = null
+
 	@TableField(fill = FieldFill.INSERT_UPDATE)
 	var updateTime: LocalDateTime? = null
 }

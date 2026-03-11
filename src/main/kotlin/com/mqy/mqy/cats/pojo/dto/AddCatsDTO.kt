@@ -64,7 +64,7 @@ data class AddCatsDTO(
 	 * 1-待领养，2-已被领养，3-在家，4-失踪，5-去了喵星
 	 */
 	@get:JsonProperty(required = true) @field:JsonProperty(required = true)
-	val status: Int,
+	val state: Int,
 
 	/**
 	 * 那是一个晴朗的晚上.............

@@ -19,10 +19,10 @@ interface FollowMapper : BaseMapper<FollowEntity> {
 	fun findAnyStatusFollowRecord(@Param("catId") catId: Long, @Param("userId") userId: Long): FollowEntity?
 
 	// 用于恢复软删除的状态
-	@Update("UPDATE followings SET status = 0, update_time = CURRENT_TIMESTAMP WHERE id = #{id}")
+	@Update("UPDATE followings SET deleted = 0, update_time = CURRENT_TIMESTAMP WHERE id = #{id}")
 	fun restoreFollowStatus(@Param("id") id: Long): Int
 
-	@Select("select * from followings where user_id = #{userId} and cat_id = #{catId} and status = 0 limit 1")
+	@Select("select * from followings where user_id = #{userId} and cat_id = #{catId} and deleted = 0 limit 1")
 	fun findUserFollowCatByCatId(@Param("catId") catId: Long, @Param("userId") userId: Long): FollowEntity?
 
 }

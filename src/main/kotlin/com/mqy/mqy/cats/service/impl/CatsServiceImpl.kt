@@ -66,7 +66,7 @@ class CatsServiceImpl(
 				neuteredStatus = addCatsDTO.neuteredStatus
 				birthDate = addCatsDTO.birthData
 				arrivalDate = addCatsDTO.arrivalDate
-				status = addCatsDTO.status
+				state = addCatsDTO.state
 				coatColor = addCatsDTO.coatColor
 				position = addCatsDTO.position
 				story = addCatsDTO.story
@@ -89,7 +89,7 @@ class CatsServiceImpl(
 		val existFollow = followMapper.findAnyStatusFollowRecord(id, userId)
 
 		if (existFollow != null) {
-			if (existFollow.status == 0) {
+			if (existFollow.deleted == 0) {
 				throw RuntimeException("您已经关注过该猫咪，请勿重复操作")
 			} else {
 				followMapper.restoreFollowStatus(existFollow.id!!)
@@ -114,7 +114,7 @@ class CatsServiceImpl(
 		followMapper.findUserFollowCatByCatId(id, user.id.toLong()) ?: throw RuntimeException("未关注该猫咪")
 
 		val wrapper = KtUpdateWrapper(FollowEntity()).eq(FollowEntity::catId, id)
-			.eq(FollowEntity::userId, userId).set(FollowEntity::status, 1)
+			.eq(FollowEntity::userId, userId).set(FollowEntity::deleted, 1)
 		val updateRecord = FollowEntity()
 		followMapper.update(updateRecord, wrapper)
 		followMapper.decreaseFollowCatCount(user.id.toLong())
@@ -135,7 +135,7 @@ class CatsServiceImpl(
 			name = catEntity.name!!,
 			neuteredStatus = catEntity.neuteredStatus!!,
 			position = catEntity.position.toString(),
-			status = catEntity.status!!,
+			status = catEntity.state!!,
 			userInfo = UserStats(isFollow),
 			story = catEntity.story.toString()
 		)
@@ -147,7 +147,7 @@ class CatsServiceImpl(
 		val userId = (SecurityContextHolder.getContext().authentication.principal as CustomUserDetail).id.toLong()
 		val catId = adoptCatDTO.catID
 		val catEntity = catMapper.selectCatByCatId(catId) ?: throw RuntimeException("未找到该猫咪，请检查id")
-		if (catEntity.status!! != 1) throw RuntimeException("该猫咪已经有主人啦")
+		if (catEntity.state!! != 1) throw RuntimeException("该猫咪已经有主人啦")
 		val adoptEntity = CatAdoptEntity().apply {
 			this.userId = userId
 			this.catId = adoptCatDTO.catID
