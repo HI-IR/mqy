@@ -7,7 +7,7 @@ import com.mqy.mqy.database.entity.user.UserEntity
  */
 fun UserEntity.generateClaims() = mapOf(
 	"id" to id.toString(),
-	"username" to username,
-	"avatarUrl" to avatarUrl,
-	"role" to role
+	"username" to username!!,
+	"avatarUrl" to avatarUrl!!,
+	"role" to role!!
 )

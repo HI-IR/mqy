@@ -1,24 +1,24 @@
 package com.mqy.mqy.database.entity.user
 
-import com.baomidou.mybatisplus.annotation.FieldFill
-import com.baomidou.mybatisplus.annotation.IdType
-import com.baomidou.mybatisplus.annotation.TableField
-import com.baomidou.mybatisplus.annotation.TableId
-import com.baomidou.mybatisplus.annotation.TableName
+import com.baomidou.mybatisplus.annotation.*
 import java.time.LocalDateTime
 
 /**
  * 关注信息表
  */
 @TableName("followings")
-data class FollowEntity(
+class FollowEntity {
 	@TableId(type = IdType.AUTO)
-	val id: Long? = null,
-	val userId: Long = 0L,
-	val catId: Long = 0L,
-	val status: Int = 1, // 0表示取消关注，1表示关注
+	var id: Long? = null
+	var userId: Long? = null
+	var catId: Long? = null
+
 	@TableField(fill = FieldFill.INSERT)
-	val createTime: LocalDateTime? = null,
+	var createTime: LocalDateTime? = null
+
 	@TableField(fill = FieldFill.INSERT_UPDATE)
-	val updateTime: LocalDateTime? = null
-)
+	var updateTime: LocalDateTime? = null
+
+	@TableLogic(value = "0", delval = "1")
+	var status: Int = 0 // 0表示未删除，1表示已删除
+}

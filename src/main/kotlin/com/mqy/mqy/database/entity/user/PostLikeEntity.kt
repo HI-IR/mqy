@@ -1,24 +1,21 @@
 package com.mqy.mqy.database.entity.user
 
-import com.baomidou.mybatisplus.annotation.FieldFill
-import com.baomidou.mybatisplus.annotation.IdType
-import com.baomidou.mybatisplus.annotation.TableField
-import com.baomidou.mybatisplus.annotation.TableId
-import com.baomidou.mybatisplus.annotation.TableName
+import com.baomidou.mybatisplus.annotation.*
 import java.time.LocalDateTime
 
 //动态点赞
 @TableName("post_like")
-data class PostLikeEntity(
+class PostLikeEntity {
 	@TableId(type = IdType.AUTO)
-	val id: Long? = null,
-	val userId: Long = 0L,
-	val postId: Long = 0L,
-	val state: Int = 1, // 1表示动态点赞，0表示取消点赞
+	var id: Long? = null
+	var userId: Long? = null
+	var postId: Long? = null
+
+	@TableLogic(value = "0", delval = "1")
+	var state: Int? = null // 0表示有效， 表示无效
 
 	@TableField(fill = FieldFill.INSERT)
-	val createTime: LocalDateTime? = null,
-
+	var createTime: LocalDateTime? = null
 	@TableField(fill = FieldFill.INSERT_UPDATE)
-	val updateTime: LocalDateTime? = null
-)
+	var updateTime: LocalDateTime? = null
+}

@@ -1,16 +1,18 @@
 package com.mqy.mqy.auth.service.impl
 
 import com.mqy.mqy.auth.mapper.AuthMapper
+import com.mqy.mqy.auth.mapper.UserStatisticMapper
 import com.mqy.mqy.auth.pojo.req.LoginReq
 import com.mqy.mqy.auth.pojo.req.RegisterReq
-import com.mqy.mqy.auth.pojo.vo.AvatarUploadVO
 import com.mqy.mqy.auth.pojo.vo.LoginVO
+import com.mqy.mqy.auth.pojo.vo.UserAvatarUploadVO
 import com.mqy.mqy.auth.service.AuthService
 import com.mqy.mqy.auth.utlis.generateClaims
 import com.mqy.mqy.common.utils.jwt.JwtUtils
 import com.mqy.mqy.common.utils.upload.OssUtil
 import com.mqy.mqy.common.utils.upload.StsProvider
 import com.mqy.mqy.database.entity.user.UserEntity
+import com.mqy.mqy.database.entity.user.UserStatisticEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UserDetails
@@ -28,10 +30,11 @@ class AuthServiceImpl(
 	private val mapper: AuthMapper,
 	private val authenticationManager: AuthenticationManager,
 	private val jwtUtils: JwtUtils,
-	private val passwordEncoder: PasswordEncoder
+	private val passwordEncoder: PasswordEncoder,
+	private val userMapper: UserStatisticMapper
 ) : AuthService {
 	// 获取头像预上传URL
-	override fun getAvatarUploadUrl(): AvatarUploadVO {
+	override fun getAvatarUploadUrl(): UserAvatarUploadVO {
 		val dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
 		val uuid = UUID.randomUUID().toString().replace("-", "")
 		val objectKey = "tmp/avatars/$dateStr-$uuid.jpg"
@@ -44,7 +47,7 @@ class AuthServiceImpl(
 			accessKeySecret = credentials.accessKeySecret,
 			securityToken = credentials.securityToken
 		)
-		return AvatarUploadVO(
+		return UserAvatarUploadVO(
 			uploadUrl = presignedUrl,
 			objectKey = objectKey
 		)
@@ -55,7 +58,7 @@ class AuthServiceImpl(
 			UsernamePasswordAuthenticationToken(req.username, req.password)
 		)
 		val userDetails = authentication.principal as UserDetails
-		val user = mapper.getUserByUsername(userDetails.username)?:throw RuntimeException("没有找到用户")
+		val user = mapper.getUserByUsername(userDetails.username) ?: throw RuntimeException("没有找到用户")
 
 		val token = jwtUtils.generateToken(user.generateClaims())
 		return LoginVO(
@@ -73,34 +76,33 @@ class AuthServiceImpl(
 		if (mapper.getUserByUsername(request.username) != null) {
 			throw RuntimeException("用户名已存在")
 		}
-
 		val encodedPassword = passwordEncoder.encode(request.password)
 		val sourceKey = request.avatarKey
 		val targetKey = normalizeAvatarKey(sourceKey)
-
 		try {
-			ossUtil.moveObject(
-				sourceKey = sourceKey,
-				targetKey = targetKey,
-			)
-
-			val userEntity = UserEntity(
-				id = null,
-				username = request.username,
-				passwordHash = encodedPassword,
-				role = "USER",
+			val userEntity = UserEntity().apply {
+				id = null
+				username = request.username
+				passwordHash = encodedPassword
+				role = "USER"
 				avatarUrl = ossUtil.getTheCompleteURL(targetKey)
-			)
-
+			}
 			mapper.insert(userEntity)
-
-			val savedUser = mapper.getUserByUsername(request.username)
-				?: throw RuntimeException("注册失败")
-
-			val token = jwtUtils.generateToken(savedUser.generateClaims())
+			val userId = userEntity.id ?: throw RuntimeException("主键生成失败")
+			val statistics = UserStatisticEntity().apply {
+				this.userId = userId
+				this.totalFollowingCount = 0
+				this.totalPostCount = 0
+				this.totalLikesReceived = 0
+			}
+			if (userMapper.insert(statistics) < 0) {
+				throw RuntimeException("初始化统计表失败")
+			}
+			ossUtil.moveObject(sourceKey = sourceKey, targetKey = targetKey)
+			val token = jwtUtils.generateToken(userEntity.generateClaims())
 
 			return LoginVO(
-				userId = savedUser.id.toString(),
+				userId = userId.toString(),
 				accessToken = token,
 				expiresIn = 3600000
 			)

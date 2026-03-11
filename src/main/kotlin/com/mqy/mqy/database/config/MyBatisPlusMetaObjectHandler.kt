@@ -17,6 +17,6 @@ class MyBatisPlusMetaObjectHandler : MetaObjectHandler {
 	}
 
 	override fun updateFill(metaObject: MetaObject?) {
-		this.strictUpdateFill(metaObject, "updateTime", LocalDateTime::class.java, LocalDateTime.now())
+		this.setFieldValByName("updateTime", LocalDateTime.now(), metaObject)
 	}
 }

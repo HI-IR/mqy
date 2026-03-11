@@ -5,11 +5,11 @@ import com.baomidou.mybatisplus.annotation.TableId
 import com.baomidou.mybatisplus.annotation.TableName
 
 @TableName("users")
-data class UserEntity(
+class UserEntity {
 	@TableId(type = IdType.AUTO)
-	val id: Long? = null,
-	val username: String = "",
-	val passwordHash: String = "",
-	val avatarUrl: String = "",
-	val role: String = "USER"
-)
+	var id: Long? = null
+	var username: String? = null
+	var passwordHash: String? = null
+	var avatarUrl: String? = null
+	var role: String? = null
+}
