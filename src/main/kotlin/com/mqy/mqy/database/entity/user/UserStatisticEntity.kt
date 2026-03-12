@@ -14,4 +14,5 @@ class UserStatisticEntity {
 	var totalLikesReceived: Long? = null
 	var totalPostCount: Long? = null
 	var totalFollowingCount: Long? = null
+	var totalLikesCount: Long? = null
 }

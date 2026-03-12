@@ -12,7 +12,7 @@ class PostLikeEntity {
 	var postId: Long? = null
 
 	@TableLogic(value = "0", delval = "1")
-	var state: Int? = null // 0表示有效， 表示无效
+	var deleted: Int? = null // 0表示有效， 表示无效
 
 	@TableField(fill = FieldFill.INSERT)
 	var createTime: LocalDateTime? = null

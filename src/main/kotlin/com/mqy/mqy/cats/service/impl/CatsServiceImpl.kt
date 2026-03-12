@@ -35,7 +35,7 @@ class CatsServiceImpl(
 	override fun getAvatarUploadUrl(): CatsAvatarUploadVO {
 		val dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
 		val uuid = UUID.randomUUID().toString().replace("-", "")
-		val objectKey = "tmp/cats/avatar/$dateStr-$uuid.jpg"
+		val objectKey = "cats/avatar/$dateStr-$uuid.jpg"
 		//获取凭证
 		val credentials = stsProvider.getCredentials(sessionName = "CatsAvatarUpload")
 		val presignedUrl = ossUtil.generatePresignedPutUrl(
@@ -58,11 +58,7 @@ class CatsServiceImpl(
 		val user = authentication.principal as CustomUserDetail
 		catMapper.selectUserByUserId(user.id.toLong()) ?: throw RuntimeException("未找到该用户信息")
 		try {
-			val targetKey = normalizeAvatarKey(addCatsDTO.avatarKey)
-			ossUtil.moveObject(
-				sourceKey = addCatsDTO.avatarKey,
-				targetKey = targetKey,
-			)
+			val targetKey = addCatsDTO.avatarKey
 			val catEntity = CatEntity().apply {
 				name = addCatsDTO.name
 				avatar = ossUtil.getTheCompleteURL(targetKey)
@@ -70,7 +66,7 @@ class CatsServiceImpl(
 				neuteredStatus = addCatsDTO.neuteredStatus
 				birthDate = addCatsDTO.birthData
 				arrivalDate = addCatsDTO.arrivalDate
-				status = addCatsDTO.status
+				state = addCatsDTO.state
 				coatColor = addCatsDTO.coatColor
 				position = addCatsDTO.position
 				story = addCatsDTO.story
@@ -93,7 +89,7 @@ class CatsServiceImpl(
 		val existFollow = followMapper.findAnyStatusFollowRecord(id, userId)
 
 		if (existFollow != null) {
-			if (existFollow.status == 0) {
+			if (existFollow.deleted == 0) {
 				throw RuntimeException("您已经关注过该猫咪，请勿重复操作")
 			} else {
 				followMapper.restoreFollowStatus(existFollow.id!!)
@@ -118,7 +114,7 @@ class CatsServiceImpl(
 		followMapper.findUserFollowCatByCatId(id, user.id.toLong()) ?: throw RuntimeException("未关注该猫咪")
 
 		val wrapper = KtUpdateWrapper(FollowEntity()).eq(FollowEntity::catId, id)
-			.eq(FollowEntity::userId, userId).set(FollowEntity::status, 1)
+			.eq(FollowEntity::userId, userId).set(FollowEntity::deleted, 1)
 		val updateRecord = FollowEntity()
 		followMapper.update(updateRecord, wrapper)
 		followMapper.decreaseFollowCatCount(user.id.toLong())
@@ -139,21 +135,19 @@ class CatsServiceImpl(
 			name = catEntity.name!!,
 			neuteredStatus = catEntity.neuteredStatus!!,
 			position = catEntity.position.toString(),
-			status = catEntity.status!!,
+			status = catEntity.state!!,
 			userInfo = UserStats(isFollow),
 			story = catEntity.story.toString()
 		)
 
 	}
 
-	/**
-	 * 收养猫咪
-	 */
+
 	override fun adoptCat(adoptCatDTO: AdoptCatDTO) {
 		val userId = (SecurityContextHolder.getContext().authentication.principal as CustomUserDetail).id.toLong()
 		val catId = adoptCatDTO.catID
 		val catEntity = catMapper.selectCatByCatId(catId) ?: throw RuntimeException("未找到该猫咪，请检查id")
-		if (catEntity.status!! != 1) throw RuntimeException("该猫咪已经有主人啦")
+		if (catEntity.state!! != 1) throw RuntimeException("该猫咪已经有主人啦")
 		val adoptEntity = CatAdoptEntity().apply {
 			this.userId = userId
 			this.catId = adoptCatDTO.catID
@@ -163,10 +157,5 @@ class CatsServiceImpl(
 			this.isAccept = 0
 		}
 		catAdoptMapper.insert(adoptEntity)
-	}
-
-	private fun normalizeAvatarKey(tempKey: String): String {
-		require(tempKey.startsWith("tmp/cats/avatar/")) { "非法头像路径" }
-		return tempKey.removePrefix("tmp/")
 	}
 }

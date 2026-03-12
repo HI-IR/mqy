@@ -18,6 +18,12 @@ import org.springframework.web.servlet.HandlerExceptionResolver
 @Component
 class JwtFilter(private val jwtUtils: JwtUtils, private val handlerExceptionResolver: HandlerExceptionResolver) :
 	OncePerRequestFilter() {
+
+	// 允许拦截异步转发，让其重新组装一下SecurityContext
+	override fun shouldNotFilterAsyncDispatch(): Boolean {
+		return false
+	}
+
 	override fun doFilterInternal(
 		request: HttpServletRequest,
 		response: HttpServletResponse,
