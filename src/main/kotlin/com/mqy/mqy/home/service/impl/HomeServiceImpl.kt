@@ -26,13 +26,14 @@ class HomeServiceImpl(
 	private val postLikeMapper: HomePostLikeMapper,
 	private val userMapper: UserMapper
 ) : HomeService {
-	override suspend fun getHomePosts(userId: Long, cursor: Long?, limit: Int): GetPostsVO {
+	override suspend fun getHomePosts(userId: Long, cursor: Long?, limit: Int, keyword: String?): GetPostsVO {
 		// 先主表查询
 		// 按照最新发送排序
 		// 预查询，查询limit + 1 个数据，通过查到了limit+1，说明has_more
 		val prevPosts = postMapper.selectList(
 			ktQuery<PostEntity>()
 				.lt(cursor != null, PostEntity::id, cursor)//小于cursor
+				.like(keyword != null, PostEntity::title, keyword)
 				.orderByDesc(PostEntity::id)
 				.last("LIMIT ${limit + 1}")
 		)
@@ -101,7 +102,7 @@ class HomeServiceImpl(
 			// authId: User(可以通过post实例找到对应的authId，进而找到User)
 			val authInfoMap = authInfoDeferred.await()
 
-			val postsListVO = posts.map {
+			val postsListVO = posts.map { it ->
 				val cat = catMap[it.catId] ?: CatEntity()
 				val auth = authInfoMap[it.userId] ?: UserEntity()
 				val media = mediaMap[it.id] ?: emptyList()
@@ -144,6 +145,50 @@ class HomeServiceImpl(
 				posts = postsListVO
 			)
 		}
+	}
 
+	override suspend fun getGallery(
+		cursor: Long?,
+		limit: Int,
+		state: Int?,
+		keyword: String?
+	): GalleryVO {
+		val prevCats = catMapper.selectList(
+			ktQuery<CatEntity>()
+				.lt(cursor != null, CatEntity::id, cursor)//小于cursor
+				.eq(state != null, CatEntity::state, state)
+				.like(keyword != null, CatEntity::name, keyword)
+				.orderByDesc(CatEntity::id)
+				.last("LIMIT ${limit + 1}")
+		)
+		if (prevCats.isEmpty()) {
+			return GalleryVO(
+				hasMore = false,
+				nextCursor = -1,
+				cats = emptyList()
+			)
+		}
+
+		val hasMore = prevCats.size == limit + 1
+		//去掉最后一个
+		val catsList = if (hasMore) prevCats.dropLast(1) else prevCats
+		val nextCursor = catsList.last().id!!
+
+		val cats = catsList.map {
+			CatInfo(
+				avatar = it.avatar.orEmpty(),
+				catID = it.id ?: 0,
+				coatColor = it.coatColor!!,
+				gender = it.gender!!,
+				name = it.name ?: "未知猫咪",
+				position = it.position.orEmpty(),
+				state = it.state!!
+			)
+		}
+		return GalleryVO(
+			cats = cats,
+			hasMore = hasMore,
+			nextCursor = nextCursor
+		)
 	}
 }
