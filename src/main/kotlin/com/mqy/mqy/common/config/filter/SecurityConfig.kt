@@ -29,7 +29,8 @@ class SecurityConfig(
 		HttpMethod.POST to "/auth/login",
 		HttpMethod.POST to "/auth/register",
 		HttpMethod.GET to "/posts/*",
-		HttpMethod.POST to "/suggest"
+		HttpMethod.POST to "/suggest",
+		HttpMethod.GET to "/home/posts"
 	)
 
 	private val adminUrl = listOf(
