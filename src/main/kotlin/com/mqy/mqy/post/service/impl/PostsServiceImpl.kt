@@ -87,6 +87,7 @@ class PostsServiceImpl(
 			}
 		}
 		mediaMapper.insertBatch(mediasEntity)
+		postMapper.increasePostCount(userId)
 		return AddPostsVO(postId)
 	}
 
