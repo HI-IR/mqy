@@ -3,6 +3,7 @@ package com.mqy.mqy.user.vo
 data class UserInfoVO(
 	val avatarURL: String,
 	val name: String,
+	val role: String,
 	val userFollowCount: Long,
 	val userID: Long,
 	val userLikeCount: Long,

@@ -64,7 +64,7 @@ class AuthServiceImpl(
 		return LoginVO(
 			userId = user.id.toString(),
 			accessToken = token,
-			expiresIn = 3600000
+			expiresIn = 3600000,
 		)
 	}
 
@@ -73,9 +73,13 @@ class AuthServiceImpl(
 	 */
 	@Transactional
 	override fun doRegister(request: RegisterReq): LoginVO {
-		if (mapper.getUserByUsername(request.username) != null) {
-			throw RuntimeException("用户名已存在")
+		if (!request.avatarKey.startsWith("avatars/")){
+			throw RuntimeException("头像上传错误，请重试")
 		}
+
+			if (mapper.getUserByUsername(request.username) != null) {
+				throw RuntimeException("用户名已存在")
+			}
 		val encodedPassword = passwordEncoder.encode(request.password)
 		val sourceKey = request.avatarKey
 		try {
@@ -103,7 +107,7 @@ class AuthServiceImpl(
 			return LoginVO(
 				userId = userId.toString(),
 				accessToken = token,
-				expiresIn = 3600000
+				expiresIn = 3600000,
 			)
 		} catch (e: Exception) {
 			throw RuntimeException("注册失败: ${e.message}", e)

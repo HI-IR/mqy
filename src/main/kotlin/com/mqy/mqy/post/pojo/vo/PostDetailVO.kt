@@ -26,8 +26,6 @@ data class Cat(
 )
 
 data class DetailMedia(
-	val width: Int,
-	val height: Int,
 	val url: String,
 	val mediaType: MediaType,
 	val thumbnailURL: String

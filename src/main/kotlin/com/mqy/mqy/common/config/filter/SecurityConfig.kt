@@ -25,6 +25,7 @@ class SecurityConfig(
 	private val jwtFilter: JwtFilter,
 	private val userService: UserServiceImpl
 ) {
+	// 不带token
 	private val permitUrl = listOf(
 		HttpMethod.GET to "/auth/avatar-upload-url",
 		HttpMethod.POST to "/auth/login",
@@ -35,6 +36,7 @@ class SecurityConfig(
 		HttpMethod.GET to "/home/gallery"
 	)
 
+	// 管理员权限
 	private val adminUrl = listOf(
 		HttpMethod.GET to "/cats/avatar-upload-url",
 		HttpMethod.POST to "/cats"

@@ -26,8 +26,6 @@ data class AddPostsDTO(
 }
 
 data class Media(
-	@get:JsonProperty(required = true) @field:JsonProperty(required = true)
-	val height: Int,
 	/**
 	 * 或者VIDEO 、IMAGE
 	 */
@@ -38,6 +36,4 @@ data class Media(
 	@get:JsonProperty("object_key", required = true) @field:JsonProperty("object_key", required = true)
 	val objectKey: String,
 
-	@get:JsonProperty(required = true) @field:JsonProperty(required = true)
-	val width: Int
 )

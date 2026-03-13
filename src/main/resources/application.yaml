@@ -3,7 +3,7 @@ server:
   address: 0.0.0.0
 spring:
   profiles:
-    active: prod
+    active: local
   application:
     name: mqy
   # 数据库配置在application-local.yaml中配置
