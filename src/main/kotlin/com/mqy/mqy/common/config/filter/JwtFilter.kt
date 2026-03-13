@@ -4,6 +4,7 @@ import com.mqy.mqy.common.utils.jwt.JwtUtils
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
@@ -18,6 +19,10 @@ import org.springframework.web.servlet.HandlerExceptionResolver
 @Component
 class JwtFilter(private val jwtUtils: JwtUtils, private val handlerExceptionResolver: HandlerExceptionResolver) :
 	OncePerRequestFilter() {
+
+	override fun shouldNotFilter(request: HttpServletRequest): Boolean {
+		return request.method == HttpMethod.OPTIONS.name()
+	}
 
 	// 允许拦截异步转发，让其重新组装一下SecurityContext
 	override fun shouldNotFilterAsyncDispatch(): Boolean {
