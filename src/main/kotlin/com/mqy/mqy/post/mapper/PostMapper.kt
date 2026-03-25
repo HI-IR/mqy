@@ -10,4 +10,7 @@ import org.apache.ibatis.annotations.Update
 interface PostMapper : BaseMapper<PostEntity> {
 	@Update("UPDATE user_statistics SET total_post_count = total_post_count + 1 WHERE user_id = #{userId}")
 	fun increasePostCount(@Param("userId") userId: Long)
+
+	@Update("UPDATE user_statistics SET total_post_count = total_post_count - 1 WHERE user_id = #{userId}")
+	fun decreasePostCount(userId: Long)
 }
