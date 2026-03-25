@@ -36,3 +36,8 @@ build/
 *-local.yml
 *-local.yaml
 *-local.properties
+
+### prod info ###
+*-prod.yml
+*-prod.yaml
+*-prod.properties

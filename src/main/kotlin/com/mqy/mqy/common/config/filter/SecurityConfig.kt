@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
+import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -24,6 +25,7 @@ class SecurityConfig(
 	private val jwtFilter: JwtFilter,
 	private val userService: UserServiceImpl
 ) {
+	// 不带token
 	private val permitUrl = listOf(
 		HttpMethod.GET to "/auth/avatar-upload-url",
 		HttpMethod.POST to "/auth/login",
@@ -34,6 +36,7 @@ class SecurityConfig(
 		HttpMethod.GET to "/home/gallery"
 	)
 
+	// 管理员权限
 	private val adminUrl = listOf(
 		HttpMethod.GET to "/cats/avatar-upload-url",
 		HttpMethod.POST to "/cats"
@@ -59,6 +62,7 @@ class SecurityConfig(
 	@Bean
 	fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
 		http
+			.cors(Customizer.withDefaults())
 			.csrf { it.disable() }
 			.sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
 			.authenticationProvider(authenticationProvider())

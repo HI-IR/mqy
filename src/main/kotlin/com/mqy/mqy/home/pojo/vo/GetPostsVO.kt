@@ -31,11 +31,9 @@ data class Interaction (
 )
 
 data class MediaItem (
-	val height: Int,
 	val mediaType: MediaType,
 	val thumbnailURL: String,
 	val url: String,
-	val width: Int
 )
 
 data class Publisher (

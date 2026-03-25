@@ -110,11 +110,9 @@ class HomeServiceImpl(
 
 				val mediaItemList = media.map {
 					MediaItem(
-						height = it.height ?: 0,
 						mediaType = it.mediaType,
 						thumbnailURL = it.thumbnailUrl.orEmpty(),
 						url = it.url.orEmpty(),
-						width = it.width ?: 0
 					)
 				}
 				PostItem(

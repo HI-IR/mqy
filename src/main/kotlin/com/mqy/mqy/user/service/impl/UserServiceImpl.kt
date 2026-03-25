@@ -21,6 +21,7 @@ class UserInfoServiceImpl(
 			avatarURL = user.avatarUrl ?: "",
 			name = user.username ?: "爱心人士",
 			userID = userId,
+			role = user.role?:"USER",
 			userFollowCount = userStatisticInfo.totalFollowingCount ?: 0,
 			userLikeCount = userStatisticInfo.totalLikesCount ?: 0,
 			userLikeReceived = userStatisticInfo.totalLikesReceived ?: 0,

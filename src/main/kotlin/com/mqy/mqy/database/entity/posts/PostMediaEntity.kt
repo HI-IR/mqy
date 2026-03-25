@@ -14,9 +14,6 @@ class PostMediaEntity {
 	var mediaType: MediaType = MediaType.IMAGE
 	var url: String? = null
 	var thumbnailUrl: String? = null
-	var width: Int? = null
-	var height: Int? = null
-
 	@TableField(fill = FieldFill.INSERT)
 	var createTime: LocalDateTime? = null
 

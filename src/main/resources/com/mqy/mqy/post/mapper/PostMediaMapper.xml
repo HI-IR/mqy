@@ -9,10 +9,10 @@
       Created: 2026/3/11 19:35
     -->
     <insert id="insertBatch">
-        INSERT INTO post_medias (post_id, media_type, url, thumbnail_url, width, height, create_time, update_time)
+        INSERT INTO post_medias (post_id, media_type, url, thumbnail_url, create_time, update_time)
         VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.postId}, #{item.mediaType}, #{item.url}, #{item.thumbnailUrl}, #{item.width}, #{item.height}, now(), now())
+            (#{item.postId}, #{item.mediaType}, #{item.url}, #{item.thumbnailUrl}, now(), now())
         </foreach>
     </insert>
 

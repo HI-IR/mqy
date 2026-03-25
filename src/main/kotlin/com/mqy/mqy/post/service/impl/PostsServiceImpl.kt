@@ -82,8 +82,6 @@ class PostsServiceImpl(
 				this.mediaType = media.mediaType
 				this.url = url
 				this.thumbnailUrl = thumbnailUrl
-				this.width = media.width
-				this.height = media.height
 			}
 		}
 		mediaMapper.insertBatch(mediasEntity)
@@ -111,8 +109,6 @@ class PostsServiceImpl(
 					val mediaEntities = mediaMapper.selectList(mediaSelectWrapper) ?: emptyList()
 					mediaEntities.map { media ->
 						DetailMedia(
-							width = media.width ?: 0,
-							height = media.height ?: 0,
 							url = media.url.orEmpty(),
 							mediaType = media.mediaType,
 							thumbnailURL = media.thumbnailUrl.orEmpty()
