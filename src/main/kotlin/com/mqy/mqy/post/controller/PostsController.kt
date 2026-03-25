@@ -51,4 +51,10 @@ class PostsController(private val service: PostsService) {
 		service.unLikePost(id)
 		return ApiResponse.success()
 	}
+
+	@DeleteMapping("/{postId}")
+	fun deletePost(@PathVariable postId: Long): ApiResponse {
+		service.deletePost(postId)
+		return ApiResponse.success("删除成功")
+	}
 }

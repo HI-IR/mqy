@@ -19,4 +19,6 @@ interface PostsService {
 	fun likePost(id: Long)
 
 	fun unLikePost(id: Long)
+
+	fun deletePost(postId: Long)
 }
