@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/posts")
 class PostsController(private val service: PostsService) {
-	@GetMapping("/medias/upload-urls")
+	@PostMapping("/medias/upload-urls")
 	fun getMediasUploadUrl(@RequestBody request: MediasUploadUrlDTO): ApiResponse {
 		val vo = service.getMediasUploadUrl(request)
 		return ApiResponse.success(vo)

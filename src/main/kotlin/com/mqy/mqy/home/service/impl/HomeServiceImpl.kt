@@ -26,12 +26,19 @@ class HomeServiceImpl(
 	private val postLikeMapper: HomePostLikeMapper,
 	private val userMapper: UserMapper
 ) : HomeService {
-	override suspend fun getHomePosts(userId: Long, cursor: Long?, limit: Int, keyword: String?): GetPostsVO {
+	override suspend fun getHomePosts(
+		userId: Long,
+		catId: Long?,
+		cursor: Long?,
+		limit: Int,
+		keyword: String?
+	): GetPostsVO {
 		// 先主表查询
 		// 按照最新发送排序
 		// 预查询，查询limit + 1 个数据，通过查到了limit+1，说明has_more
 		val prevPosts = postMapper.selectList(
 			ktQuery<PostEntity>()
+				.eq(catId != null, PostEntity::catId, catId)
 				.lt(cursor != null, PostEntity::id, cursor)//小于cursor
 				.like(keyword != null, PostEntity::title, keyword)
 				.orderByDesc(PostEntity::id)

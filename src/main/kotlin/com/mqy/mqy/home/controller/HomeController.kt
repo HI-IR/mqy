@@ -17,11 +17,12 @@ class HomeController(private val service: HomeService) {
 	suspend fun getHomePosts(
 		@RequestParam("cursor", required = false) cursor: Long?,
 		@RequestParam("limit", required = false, defaultValue = "10") limit: Int,
-		@RequestParam("keyword", required = false) keyword: String?
+		@RequestParam("keyword", required = false) keyword: String?,
+		@RequestParam("catId", required = false) catId: Long?
 	): ApiResponse {
 		val userIdLong =
 			(SecurityContextHolder.getContext().authentication?.principal as? CustomUserDetail)?.id?.toLong() ?: -1L
-		val homePosts = service.getHomePosts(userIdLong, cursor, limit,keyword)
+		val homePosts = service.getHomePosts(userIdLong, catId, cursor, limit, keyword)
 		return ApiResponse.success(homePosts)
 	}
 
@@ -34,7 +35,6 @@ class HomeController(private val service: HomeService) {
 	): ApiResponse {
 		val galleryVO = service.getGallery(cursor, limit, state, keyword)
 		return ApiResponse.success(galleryVO)
-
 	}
 
 }
