@@ -18,19 +18,17 @@ import java.util.*
 class StsProvider(private val properties: AliyunProperties) {
 	private val client: Client by lazy {
 		val config = Config().apply {
-			// 从系统变量中读取到accessKeyId和accessKeySecret
 			accessKeyId = System.getenv("OSS_ACCESS_KEY_ID")
 			accessKeySecret = System.getenv("OSS_ACCESS_KEY_SECRET")
 			endpoint = "sts.${properties.region}.aliyuncs.com"
+			println("AccessKeyId: ${accessKeyId}")
+			println("Secret Length: ${accessKeySecret?.length}")
+// 不要直接打印全称，打印长度即可对比。如果不符，说明读取环节出问题了。
 		}
 		Client(config)
+
 	}
 
-	/**
-	 * 获取临时授权凭证
-	 * @param sessionName 会话名称，用于审计区分
-	 * @param duration 有效期（秒），默认 3600
-	 */
 	fun getCredentials(
 		sessionName: String = "DefaultSession",
 		duration: Long = 3600L
@@ -46,17 +44,9 @@ class StsProvider(private val properties: AliyunProperties) {
 }
 
 @Component
-class OssUtil(private val properties: AliyunProperties) {
-	/**
-	 * 生成 PUT 方式的预签名 URL
-	 *
-	 * @param objectKey OSS 中的文件完整路径
-	 * @param contentType 文件的 MIME 类型
-	 * @param accessKeyId STS 提供的临时 AK
-	 * @param accessKeySecret STS 提供的临时 SK
-	 * @param securityToken STS 提供的 Token
-	 * @param expireMinutes URL 有效期
-	 */
+class OssUtil(
+	private val properties: AliyunProperties
+) {
 	fun generatePresignedPutUrl(
 		objectKey: String,
 		contentType: String,
@@ -79,22 +69,23 @@ class OssUtil(private val properties: AliyunProperties) {
 		}
 	}
 
-	/**
-	 * 通过传入的objectName获取完整的URL
-	 */
 	fun getTheCompleteURL(objectName: String): String =
 		properties.endpoint.split("//".toRegex()).dropLastWhile { it.isEmpty() }
 			.toTypedArray()[0] + "//" + properties.bucketName + "." + properties.endpoint.split("//".toRegex())
 			.dropLastWhile { it.isEmpty() }
 			.toTypedArray()[1] + "/" + objectName
 
-	/**
-	 * 获取视频的缩略图
-	 * @param originalVideoUrl 原始视频地址
-	 * @param timeMs 时间戳
-	 */
 	fun getVideoThumbnailUrl(originalVideoUrl: String, timeMs: Long = 0): String {
 		val processParams = "?x-oss-process=video/snapshot,t_$timeMs,f_jpg,m_fast"
 		return "$originalVideoUrl$processParams"
+	}
+
+	fun deleteFile(fileKey: String) {
+        val ossClient = OSSClientBuilder().build(
+            properties.endpoint,
+            System.getenv("OSS_ACCESS_KEY_ID"),
+            System.getenv("OSS_ACCESS_KEY_SECRET")
+        )
+        ossClient.deleteObject(properties.bucketName, fileKey)
 	}
 }

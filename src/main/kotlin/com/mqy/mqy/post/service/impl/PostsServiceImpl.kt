@@ -223,5 +223,52 @@ class PostsServiceImpl(
 		postsLikeMapper.decreaseLikeCount(userId)
 		postsLikeMapper.decreaseLikeReceivedCount(postEntity.userId!!)
 	}
+	@Transactional
+	override fun deletePost(postId: Long) {
+		// 1. 获取当前登录用户
+		val loginUserId = (SecurityContextHolder.getContext().authentication.principal as CustomUserDetail).id.toLong()
+
+		// 2. 检查帖子是否存在 & 是否是自己发的
+		val post = postMapper.selectById(postId) ?: throw RuntimeException("帖子不存在")
+		if (post.userId != loginUserId) {
+			throw RuntimeException("只能删除自己的帖子")
+		}
+
+		// 3. 查询这条帖子的所有媒体（图片/视频）
+		val mediaList = mediaMapper.selectList(
+			ktQuery<PostMediaEntity>().eq(PostMediaEntity::postId, postId)
+		)
+
+		// 4. 遍历删除 OSS 上的真实文件！
+		mediaList.forEach { media ->
+			val fileKey = getFileKeyFromUrl(media.url)
+			if (fileKey.isNotBlank()) {
+				ossUtil.deleteFile(fileKey) // 这里调用你刚加的 OSS 删除方法
+			}
+		}
+
+		// 5. 删除数据库数据
+		mediaMapper.delete(ktQuery<PostMediaEntity>().eq(PostMediaEntity::postId, postId))    // 删媒体
+		postsLikeMapper.delete(ktQuery<PostLikeEntity>().eq(PostLikeEntity::postId, postId)) // 删点赞
+		postMapper.deleteById(postId) // 删帖子
+		postMapper.decreasePostCount(loginUserId)
+
+
+
+	}
+
+	/**
+	 * 从 URL 里提取 OSS 的 fileKey
+	 * 例如：https://bucket.oss-xxx.aliyuncs.com/posts/abc.png → posts/abc.png
+	 */
+	private fun getFileKeyFromUrl(url: String?): String {
+		if (url.isNullOrBlank()) return ""
+		return try {
+			val uri = java.net.URI(url)
+			uri.path.trimStart('/') // 去掉前面的 /
+		} catch (_: Exception) {
+			""
+		}
+	}
 
 }
